@@ -1,0 +1,50 @@
+services:
+  ghost:
+    image: ghost:5
+    restart: always
+    environment:
+      # see https://ghost.org/docs/config/#configuration-options
+      database__client: mysql
+      database__connection__host: db
+      database__connection__user: root
+      # insecure password - db isn't externally accessible.
+      database__connection__password: example
+      database__connection__database: ghost
+      # email setup
+      mail__transport: SMTP
+      mail__options__service: Mailgun
+      mail__options__auth__user: ${MAILGUN_USER}
+      mail__options__auth__pass: ${MAILGUN_PASSWORD}
+      mail__from: "noreply@${MAILGUN_DOMAIN}"
+      # server setup
+      # this url value should be configured in the .env file, and defaults to localhost
+      url: https://${DOMAIN:-localhost}
+      server__host: 0.0.0.0
+      server__port: 2370
+    volumes:
+      - ghost:/var/lib/ghost/content
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+    volumes:
+      - mysql:/var/lib/mysql
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
+
+  caddy:
+    image: caddy:2.5.1-alpine
+    restart: unless-stopped
+    environment:
+      SITE_ADDRESS: ${DOMAIN:-localhost}
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+
+volumes:
+  mysql:
+  ghost:
