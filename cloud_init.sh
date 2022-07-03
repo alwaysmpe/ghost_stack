@@ -10,7 +10,7 @@ dnf -y install python36-oci-cli
 echo "configuring variables"
 export DOMAIN={{ ds.freeformTags.domain }}
 export MAILGUN_USER={{ ds.freeformTags.mailgun_user }}
-export MAILGUN_DOMAIN={{ ds.freeformTags.mailgun_domain }}
+export MAILGUN_SMTP_DOMAIN={{ ds.freeformTags.mailgun_smtp_domain }}
 export MAILGUN_PASSWORD=`oci secrets secret-bundle get --auth instance_principal --secret-id {{ ds.freeformTags.mailgun_pass_oci }} --query='data."secret-bundle-content".content' --raw-output | base64 -d`
 
 # configure firewall

@@ -14,6 +14,10 @@
     * create oci vault
     * create oci secret - mailgun password
     * create server, add tags, run script
+        * domain
+        * mailgun_user
+        * mailgun_domain
+        * mailgun_pass_oci
     * launch server, run script
     * configure cloudflare dns
     * setup server

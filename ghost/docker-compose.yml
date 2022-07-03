@@ -13,10 +13,10 @@ services:
       # email setup
       mail__transport: SMTP
       mail__options__service: Mailgun
-      mail__options__host: smtp.mailgun.org
+      mail__options__host: ${MAILGUN_SMTP_DOMAIN}
       mail__options__port: 587
-      mail__options__secure: "true"
-      mail__options__auth__user: ${MAILGUN_USER}
+      mail__options__secure: "false"
+      mail__options__auth__user: "postmaster@${MAILGUN_DOMAIN}"
       mail__options__auth__pass: ${MAILGUN_PASSWORD}
       mail__from: "noreply@${MAILGUN_DOMAIN}"
       # server setup
