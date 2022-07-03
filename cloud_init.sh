@@ -2,34 +2,38 @@
 #!/bin/sh
 
 # install oci cli
-sudo dnf -y install oraclelinux-developer-release-el8
-sudo dnf -y install python36-oci-cli
-
+echo "installing tools"
+dnf -y install oraclelinux-developer-release-el8
+dnf -y install python36-oci-cli
 
 # get variables from cloud
+echo "configuring variables"
 export DOMAIN={{ ds.freeformTags.domain }}
 export MAILGUN_USER={{ ds.freeformTags.mailgun_user }}
 export MAILGUN_DOMAIN={{ ds.freeformTags.mailgun_domain }}
-export MAILGUN_PASSWORD=`oci secrets secret-bundle get --secret-id {{ ds.freeformTags.mailgun_pass_oci }} --query='data."secret-bundle-content".content' --raw-output | base64 -d`
+export MAILGUN_PASSWORD=`oci secrets secret-bundle get --auth instance_principal --secret-id {{ ds.freeformTags.mailgun_pass_oci }} --query='data."secret-bundle-content".content' --raw-output | base64 -d`
 
 # configure firewall
-sudo firewall-cmd --zone=public --add-service=http
-sudo firewall-cmd --zone=public --add-service=http --permanent
-sudo firewall-cmd --zone=public --add-service=https
-sudo firewall-cmd --zone=public --add-service=https --permanent
+echo "configuring firewall"
+firewall-offline-cmd --zone=public --add-service=http
+firewall-offline-cmd --zone=public --add-service=https
 
 # setup utils
-sudo dnf install -y dnf-utils zip unzip git
+echo "configuring utils"
+dnf install -y dnf-utils zip unzip git
 
 # setup docker
-sudo yum remove -y docker docker-common docker-selinux docker-engine
-sudo dnf install -y docker-ce --nobest
-sudo dnf config-manager -add-repo=https://download.docker.com/linux/centos/docker-ce.repo
-sudo dnf install -y docker-ce docker-compose-plugin --nobest
-sudo usermod -a -G docker opc
-newgrp docker
+echo "configuring docker"
+yum remove -y docker docker-common docker-selinux docker-engine
+dnf install -y docker-ce --nobest
+dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+dnf install -y docker-ce docker-compose-plugin --nobest
+usermod -a -G docker opc
+systemctl enable docker.service
+systemctl start docker.service
 
 # launch stack
-git clone https://github.com/alwaysmpe/ghost_stack.git
-cd ghost_stack/ghost
-docker compose up
+echo "configuring stack"
+su - opc -c "git clone https://github.com/alwaysmpe/ghost_stack.git"
+su -p opc -c 'cd /home/opc/ghost_stack/ghost && printf "DOMAIN=${DOMAIN}\nMAILGUN_USER=${MAILGUN_USER}\nMAILGUN_PASSWORD=${MAILGUN_PASSWORD}\nMAILGUN_DOMAIN=${MAILGUN_DOMAIN}\n" > .env'
+su - opc -c "cd ghost_stack/ghost && docker compose up --detach"

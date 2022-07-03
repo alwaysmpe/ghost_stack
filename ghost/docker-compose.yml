@@ -25,7 +25,7 @@ services:
       - ghost:/var/lib/ghost/content
 
   db:
-    image: mysql:8.0
+    image: mysql:8-oracle
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: example
@@ -35,7 +35,7 @@ services:
       - SYS_NICE  # CAP_SYS_NICE
 
   caddy:
-    image: caddy:2.5.1-alpine
+    image: caddy:latest
     restart: unless-stopped
     environment:
       SITE_ADDRESS: ${DOMAIN:-localhost}
