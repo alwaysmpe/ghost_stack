@@ -1,6 +1,11 @@
 ## template: jinja
 #!/bin/sh
 
+# install oci cli
+sudo dnf -y install oraclelinux-developer-release-el8
+sudo dnf -y install python36-oci-cli
+
+
 # get variables from cloud
 export DOMAIN={{ ds.freeformTags.domain }}
 export MAILGUN_USER={{ ds.freeformTags.mailgun_user }}
