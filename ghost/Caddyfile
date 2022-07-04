@@ -1,4 +1,8 @@
-{$SITE_ADDRESS}
-
-tls internal
-reverse_proxy ghost:2370
+{$SITE_ADDRESS} {
+	tls internal
+	reverse_proxy ghost:2370
+}
+www.{$SITE_ADDRESS} {
+	tls internal
+	redir {$SITE_ADDRESS}{uri}
+}

@@ -20,4 +20,6 @@
         * mailgun_pass_oci
     * launch server, run script
     * configure cloudflare dns
+        * add a record
+        * set ssl to full
     * setup server
